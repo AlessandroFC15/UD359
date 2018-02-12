@@ -9,10 +9,9 @@ with open('Berkeley.csv', newline='') as csvfile:
     next(reader)
 
     for row in reader:
-        result_application = row[0]
-        gender = row[1]
-        department = row[2]
-        number_of_people = int(row[3])
+        result_application, gender, department, number_of_people = row
+
+        number_of_people = int(number_of_people)
 
         for i in range(0, number_of_people):
             person_data = {

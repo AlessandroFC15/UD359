@@ -7,6 +7,8 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import json
 import re
+import datetime
+from src.soccer_scraper.exceptions import TeamStatisticsNotFound
 
 
 class LeagueScraper:
@@ -157,13 +159,13 @@ class LeagueScraper:
         return detailed_data
 
     def scrape_teams_statistics(self, season_data):
-        teams_data = LeagueScraper.get_teams_position_data(season_data['relative_url'])
-
         team_statistics_url = LeagueScraper.get_teams_statistics_url(season_data['relative_url'])
 
         if not team_statistics_url:
             print("# Season {} doesn't have team statistics".format(season_data['season']))
-            return
+            raise TeamStatisticsNotFound()
+
+        teams_data = LeagueScraper.get_teams_position_data(season_data['relative_url'])
 
         detailed_stats = self.get_teams_detailed_stats(team_statistics_url, season_data['season'])
 
@@ -187,25 +189,21 @@ class LeagueScraper:
 
         print(self.seasons)
 
-        # self.seasons = [
-        #     {'season': '2017-2018',
-        #     'relative_url': '/Regions/252/Tournaments/2/Seasons/6829/England-Premier-League' }
-        # ]
-
         for season in self.seasons:
             print('>> Scraping season {}'.format(season['season']))
 
-            self.scrape_teams_statistics(season)
+            try:
+                self.scrape_teams_statistics(season)
+            except TeamStatisticsNotFound:
+                break
 
         self.data_frame = pd.DataFrame(self.league_data)
 
-        print(self.data_frame)
-
-        self.data_frame.to_csv('/home/alessandro/dadosCrl.csv', index=False)
+        self.data_frame.to_csv('/home/alessandro/{}.csv'.format(self.league_name), index=False)
 
 
-premier_league_scraper = LeagueScraper(league_url="https://www.whoscored.com/Regions/252/Tournaments/2/England-Premier-League",
-                                       league_name="Premier League")
+league_scraper = LeagueScraper(league_url="https://www.whoscored.com/Regions/206/Tournaments/4/Spain-La-Liga",
+                                       league_name="La Liga")
 
-# premier_league_scraper.start()
+league_scraper.start()
 

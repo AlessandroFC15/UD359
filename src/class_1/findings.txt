@@ -1,0 +1,3 @@
+If you look closely at the admission percentage per department, you will see some interesting results.
+
+For example, on department A de female percentage admission is 82%.
